@@ -1,0 +1,94 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.10
+    rbenv_user: root
+    rbenv_root: ~/.rbenv
+    ruby_version: 3.2.4
+  # environment:
+  #   https_proxy: http://192.168.56.1:7890
+  #   http_proxy: http://192.168.56.1:7890
+  #   all_proxy: socks5://192.168.56.1:7890
+
+  pre_tasks:
+    - apt: update_cache=true cache_valid_time=3600
+
+  tasks:
+  - name: download rbenv-doctor
+    get_url:
+      url: https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-doctor
+      dest: "/usr/local/bin/rbenv-doctor"
+      mode: '0755'
+
+  # https://github.com/rbenv/ruby-build/wiki#ubuntudebianmint
+  - name: install ruby-build dependencies(latest stable version)
+    apt:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - build-essential
+      - autoconf
+      - libssl-dev
+      - libyaml-dev
+      - zlib1g-dev
+      - libffi-dev
+      - libgmp-dev
+      - rustc
+
+  - name: install ruby-build dependencies(old stable versions)
+    apt:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - patch
+      - libreadline6-dev
+      - libncurses5-dev
+      - libgdbm6
+      - libgdbm-dev
+      - libdb-dev
+
+  - block:
+    - name: rbenv
+      git: 
+        repo: https://github.com/rbenv/rbenv.git
+        dest: "{{ rbenv_root }}"
+
+    - name: plugins
+      git:
+        repo: "{{ item.url }}"
+        dest: "{{ rbenv_root }}/plugins/{{ item.name }}"
+      with_items:
+        - { name: 'ruby-build', url: 'https://github.com/rbenv/ruby-build.git' }
+        - { name: 'rbenv-china-mirror', url: 'https://github.com/andorchen/rbenv-china-mirror.git' }
+        - { name: 'rbenv-vars', url: 'https://github.com/rbenv/rbenv-vars.git' }
+
+    # https://github.com/rbenv/rbenv?tab=readme-ov-file#how-rbenv-hooks-into-your-shell
+    - name: load rbenv
+      lineinfile:
+        path: ~/.bashrc
+        line: eval "$(~/.rbenv/bin/rbenv init - --no-rehash bash)"
+
+    # 老方案
+    # $0：指代当前正在运行的 shell 程序本身
+    # -l：表示使用 login shell 模式
+    # -c：表示执行后面的 命令字符串
+
+    # - name: "install ruby"
+    #   shell: $0 -lc "{{ rbenv_root }}/bin/rbenv install --skip-existing {{ ruby_version }}"
+    #   args:
+    #     # https://github.com/rbenv/rbenv?tab=readme-ov-file#installing-ruby-versions
+    #     creates: "{{ rbenv_root }}/versions/{{ ruby_version }}"
+    #   environment:
+    #     RUBY_CONFIGURE_OPTS: --disable-install-doc --disable-install-rdoc
+
+    # - name: set default version
+    #   lineinfile:
+    #     path: "{{ rbenv_root }}/version"
+    #     line: "{{ ruby_version }}"
+    #     create: true
+    #     mode: '0644'
+
+
+    become: true
+    become_user: "{{ rbenv_user }}"
