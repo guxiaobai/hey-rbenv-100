@@ -4,6 +4,20 @@
 |:---:|:---:
 `Sat Aug  2 14:21:08 CST 2025` | -
 
+## macOS
+
+```bash
+brew install rbenv
+
+
+```
+
+
+
+
+
+
+
 ## rbenv-doctor
 
 ```
@@ -25,6 +39,14 @@ set -Ux RUBY_CONFIGURE_OPTS --disable-install-doc --disable-install-rdoc \
 ```
 
 ## Fish
+
+```bash
+brew install rbenv
+
+# rbenv init
+# 略显冗余，可以采用下面方法手动处理
+status --is-interactive; and rbenv init - --no-rehash fish | source
+```
 
 > `~/.config/fish/config.fish`
 
