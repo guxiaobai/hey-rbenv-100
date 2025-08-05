@@ -3,7 +3,7 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3.10
-    rbenv_user: root
+    rbenv_user: vagrant
     rbenv_root: ~/.rbenv
     ruby_version: 3.2.4
   # environment:
@@ -15,6 +15,13 @@
     - apt: update_cache=true cache_valid_time=3600
 
   tasks:
+  - name: install dependencies
+    apt:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - acl
+
   - name: download rbenv-doctor
     get_url:
       url: https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-doctor
@@ -64,10 +71,10 @@
         - { name: 'rbenv-vars', url: 'https://github.com/rbenv/rbenv-vars.git' }
 
     # https://github.com/rbenv/rbenv?tab=readme-ov-file#how-rbenv-hooks-into-your-shell
-    - name: load rbenv
-      lineinfile:
-        path: ~/.bashrc
-        line: eval "$(~/.rbenv/bin/rbenv init - --no-rehash bash)"
+    # - name: load rbenv
+    #   lineinfile:
+    #     path: ~/.bashrc
+    #     line: eval "$(~/.rbenv/bin/rbenv init - --no-rehash bash)"
 
     # 老方案
     # $0：指代当前正在运行的 shell 程序本身
