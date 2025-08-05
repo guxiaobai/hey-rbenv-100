@@ -46,6 +46,18 @@ export RUBY_CONFIGURE_OPTS="--disable-install-doc --disable-install-rdoc"
 set -Ux RUBY_CONFIGURE_OPTS --disable-install-doc --disable-install-rdoc 
 ```
 
+
+
+### 🧨 小内存相关
+
+```bash
+# 跳过 YJIT 编译（不推荐，除非你不需要 JIT）
+export RUBY_CONFIGURE_OPTS="--disable-yjit"
+
+# 降低并发度，减少内存使用
+export MAKEOPTS="-j1"
+```
+
 ---
 
 ```
@@ -65,6 +77,7 @@ set -Ux RUBY_CONFIGURE_OPTS --disable-install-doc --disable-install-rdoc
 ```bash
 ~/.rbenv/bin/rbenv init
 rbenv install -kv 3.3.8
+rbenv global 3.3.8
 ```
 
 
