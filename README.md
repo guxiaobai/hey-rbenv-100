@@ -19,6 +19,13 @@ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-doctor | 
 brew install rbenv
 ```
 
+```bash
+git clone https://github.com/AndorChen/rbenv-china-mirror "$(rbenv root)"/plugins/rbenv-china-mirror
+git clone https://github.com/rbenv/rbenv-vars.git "$(rbenv root)"/plugins/rbenv-vars
+```
+
+
+
 **Fish**
 
 > `~/.config/fish/config.fish`
